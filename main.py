@@ -15,7 +15,7 @@ app.logger.addHandler(logging.StreamHandler())
 def set_search_param(class_name):
     """
     Setup dictionary to search for Legendary cards with 7 or
-    more mana of the specified class type
+    more manaCost of the specified class type
     """
     class_params = {
         "locale": "en_US",
@@ -36,20 +36,24 @@ def set_search_param(class_name):
 
 
 def query_cards():
-    """Query for all Druid and Warlock legendary cards with 7 or greater mana cost."""
+    """
+    Queries for all Druid and Warlock legendary cards with 7 or greater mana cost.
+    Pull additional metadata to populate a dictionary of human-readable data for the
+    set, type, class, and rarity fields. For sets there's a list of aliases
+    for the legacy card sets.
+    """
+    # make connection to battlenet
     hearth_query = hc.Hearth()
     battle_token = hearth_query.get_hearth_connection()
+    # instantiate the dictionaries for the cards
     combined_cards = []
     meta_query = {'set_id': {}, 'type_id': {}, 'rarity_id': {}, 'class_id': {}}
+    # run queries
     warlock_data = hearth_query.query("cards", set_search_param('warlock'), battle_token)
     druid_data = hearth_query.query("cards", set_search_param('druid'), battle_token)
     app.logger.info("Warlock and Druid card data pulled")
-    """
-    Pull additional metadata to populate a dictionary of human readable data for the 
-    set, type, class, and rarity fields. For sets there's a sub field of aliases 
-    for the legacy card sets.
-    """
     hearth_metadata = hearth_query.query("metadata", {"locale": "en_US"}, battle_token)
+    # populate the custom dictionary for adding the human-readable information
     for card_sets in hearth_metadata['sets']:
         meta_query['set_id'][card_sets['id']] = card_sets['name']
         if 'aliasSetIds' in card_sets:
@@ -63,7 +67,8 @@ def query_cards():
         meta_query['class_id'][card_classes['id']] = card_classes['name']
     app.logger.info("Metadata dictionary prepared")
     # print(json.dumps(meta_query, indent=4))
-    """add the human readable fields to the card data"""
+    # add the human readable fields to the card data
+    # TODO create a module to remove the duplicate code
     for card in warlock_data['cards']:
         card['set_name'] = meta_query['set_id'][card['cardSetId']]
         card['type_name'] = meta_query['type_id'][card['cardTypeId']]
@@ -83,7 +88,8 @@ def query_cards():
 
 @app.route('/')
 def hearthstone_query():
-    """ display a random selection of 10 cards sorted by their ID"""
+    """ displays a random selection of 10 cards sorted by their ID"""
+    # sort the 10 random cards by their Id
     sorted_cards = sorted(sample(query_cards(), 10), key=lambda obj: obj['id'])
     # print(json.dumps(sorted_cards, indent=4))
     app.logger.info("Random 10 cards selected and sorted by card id")

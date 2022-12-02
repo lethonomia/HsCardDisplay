@@ -17,9 +17,9 @@ class Hearth(object):
 
     def get_hearth_connection(self):
         """
-        Retrieve credentials from ENV and open a session
-        with battle.net returns an access token
+        Retrieves credentials from ENV and opens a session with battle.net returns an access token
         """
+        # TODO replace with a standard security solution for retieving secrets
         battle_secret = os.environ.get('BATTLE_SECRET')
         battle_id = os.environ.get('BATTLE_ID')
         client = BackendApplicationClient(client_id=battle_id)
@@ -32,6 +32,7 @@ class Hearth(object):
         """
         Queries Hearthstone API endpoints based on parameters passed to it.
         """
+        # TODO expand this to a more flexible query
         card_url = self.api_url + "/" + endpoint
         card_header = {"Authorization": "Bearer {token}".format(token=battle_token)}
         response = requests.get(card_url, headers=card_header, params=query)
