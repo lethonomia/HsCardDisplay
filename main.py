@@ -4,8 +4,10 @@ import flask
 from flask import Flask
 from random import sample
 import hearthstone.hearth_api as hc
+from sys import stdout
 
 app = Flask(__name__)
+# Define logger
 
 
 def set_search_param(class_name):
@@ -39,6 +41,7 @@ def query_cards():
     meta_query = {'set_id': {}, 'type_id': {}, 'rarity_id': {}, 'class_id': {}}
     warlock_data = hearth_query.query("cards", set_search_param('warlock'), battle_token)
     druid_data = hearth_query.query("cards", set_search_param('druid'), battle_token)
+    app.logger.info("Warlock and Druid card data pulled")
     """
     Pull additional metadata to populate a dictionary of human readable data for the 
     set, type, class, and rarity fields. For sets there's a sub field of aliases 
@@ -56,6 +59,7 @@ def query_cards():
         meta_query['rarity_id'][card_rarities['id']] = card_rarities['name']
     for card_classes in hearth_metadata['classes']:
         meta_query['class_id'][card_classes['id']] = card_classes['name']
+    app.logger.info("Metadata dictionary prepared")
     # print(json.dumps(meta_query, indent=4))
     """add the human readable fields to the card data"""
     for card in warlock_data['cards']:
@@ -71,6 +75,7 @@ def query_cards():
         card['class_name'] = meta_query['class_id'][card['classId']]
         combined_cards.append(card)
     # print(json.dumps(combined_cards, indent=4))
+    app.logger.info("Enriched card dictionary created.")
     return combined_cards
 
 
@@ -79,8 +84,9 @@ def hearthstone_query():
     """ display a random selection of 10 cards sorted by their ID"""
     sorted_cards = sorted(sample(query_cards(), 10), key=lambda obj: obj['id'])
     # print(json.dumps(sorted_cards, indent=4))
+    app.logger.info("Random 10 cards selected and sorted by card id")
     return flask.render_template('index.html', cards=sorted_cards)
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8553, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)
