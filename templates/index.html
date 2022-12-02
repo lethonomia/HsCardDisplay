@@ -16,20 +16,20 @@
     the Druid and Warlock classes sorted by card Id.<strong></p>
 <table bordercolor = black >
     <tr>
+        <th>Image</th>
         <th>Name</th>
-        <th>Class</th>
         <th>Type</th>
         <th>Rarity</th>
         <th>Set</th>
-        <th>Image</th>
+        <th>Class</th>
     </tr>
 {% for card in cards %}
     <tr>
-        <td>{{card["name"]}}</td>
-        <td>{{card["class_name"]}}</td>
-        <td>{{card["type_name"]}}</td>
-        <td>{{card["set_name"]}}</td>
-        <td>{{card["rarity_name"]}}</td>
         <td><img src='{{card["image"]}}' title='{{card["id"]}}' height=250 width=200/></td>
+        <td>{{card["name"]}}</td>
+        <td>{{card["type_name"]}}</td>
+        <td>{{card["rarity_name"]}}</td>
+        <td>{{card["set_name"]}}</td>
+        <td>{{card["class_name"]}}</td>
 {% endfor %}
 </table>
