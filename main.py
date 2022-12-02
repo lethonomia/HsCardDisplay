@@ -4,10 +4,12 @@ import flask
 from flask import Flask
 from random import sample
 import hearthstone.hearth_api as hc
-from sys import stdout
+import logging
 
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
 app = Flask(__name__)
-# Define logger
+app.logger.addHandler(logging.StreamHandler())
 
 
 def set_search_param(class_name):
@@ -89,4 +91,4 @@ def hearthstone_query():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=False)
